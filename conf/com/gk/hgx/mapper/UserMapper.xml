@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.gk.hgx.mapper.UserMapper">
+
+	<!-- public void add(User user); -->
+	<insert id="add" parameterType="com.gk.hgx.bean.User">
+		insert into t_user(loginname,loginpass,email,activationCode) values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+
+			<if test="loginname!=null">
+				#{loginname},
+			</if>
+
+			<if test="loginpass!=null">
+				#{loginpass},
+			</if>
+
+			<if test="email!=null">
+				#{email},
+			</if>
+			<!-- <if test="status!=null"> #{status}, </if> -->
+
+			<if test="activationCode!=null">
+				#{activationCode}
+			</if>
+
+		</trim>
+
+	</insert>
+
+	<!-- public int findUserByLoginname(String loginname); -->
+
+	<select id="findUserByLoginname" resultType="int">
+		select count(1) from
+		t_user where loginname=#{loginname}
+	</select>
+
+	<!-- public int findUserByEmail(String email); -->
+	<select id="findUserByEmail" resultType="int">
+		select count(1) from
+		t_user where email=#{email}
+	</select>
+
+	<!-- public boolean getUserByLoginnameAndLoginpass(User user); -->
+
+	<select id="getUserByLoginnameAndLoginpass" resultType="com.gk.hgx.bean.User">
+		select
+		uid,loginname,loginpass,email,status,activationCode
+		from t_user where
+		loginname=#{loginname} and loginpass=#{loginpass}
+	</select>
+
+	<!-- public void updateByUid(Integer uid); -->
+	<update id="updateByUid">
+	  update t_user set loginpass=#{newpass} where uid=#{uid}
+	</update>
+</mapper>
+

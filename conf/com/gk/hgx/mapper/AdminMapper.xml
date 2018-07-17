@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.gk.hgx.mapper.AdminMapper">
+
+  <resultMap type="com.gk.hgx.bean.Admin" id="admin1">
+   <id column="aid" property="aid"/>
+   <result column="aname" property="adminname"/>
+   <result column="pwd" property="adminpwd"/>
+   
+  </resultMap>
+
+	<!-- public Admin get(Admin admin); -->
+	<select id="get" resultMap="admin1">
+	   select aid,aname,pwd from t_admin where aname=#{adminname}
+	</select>
+
+
+</mapper>

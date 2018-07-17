@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.gk.hgx.mapper.CartItemMapper">
+  
+  <resultMap type="com.gk.hgx.bean.CartItem" id="cartItem1">
+     <id column="cartItemId" property="cartItemId"/>
+     <result column="uid" property="user.uid"/>
+     <association property="book" select="com.gk.hgx.mapper.BookMapper.load"
+       column="bid">
+     </association>
+     
+  </resultMap>
+  
+  
+   <resultMap type="com.gk.hgx.bean.CartItem" id="cartItem2">
+     <id column="cartItemId" property="cartItemId"/>
+     <result column="uid" property="user.uid"/>
+     <result column="bid" property="book.bid"/>
+  </resultMap>
+  
+  <sql id="cartSql1">
+   cartItemId,bid,uid,quantity,orderBy
+  </sql>
+  
+  
+  <!--	public List<CartItem> myCart(Integer uid);  -->
+  <select id="myCart" resultMap="cartItem1">
+	  select  <include refid="cartSql1"></include> from t_cartItem
+	  where uid=#{uid}
+  </select>
+  
+  
+  <!-- public CartItem queryByUidAndBid(CartItem cartItem); -->
+  <select id="queryByUidAndBid" resultMap="cartItem2">
+    select <include refid="cartSql1"></include> from t_cartItem
+    where uid=#{user.uid} and bid=#{book.bid}
+  </select>
+  
+  <!-- public void add(CartItem cartItem); -->
+  
+  <insert id="add">
+     insert into t_cartItem(bid,uid,quantity)
+     values(#{book.bid},#{user.uid},#{quantity});
+  </insert>
+  
+  <!-- 	public void updateByCartItemId(CartItem cartItem); -->
+  
+  <update id="updateByCartItemId">
+    update t_cartItem set quantity=#{quantity} where cartItemId=#{cartItemId}
+  </update>
+  
+  <!-- public void batchDelete(List<Integer> lists); -->
+  
+  <delete id="batchDelete">
+      delete from t_cartItem where cartItemId in
+      <foreach collection="list" separator="," open="(" close=")" item="list2">
+         #{list2}
+      </foreach>
+  </delete>
+  
+  <!-- public List<CartItem> findByCartItemIds(List<Integer> cartItemIds); -->
+  <select id="findByCartItemIds" resultMap="cartItem1">
+      select <include refid="cartSql1"></include>
+      from t_cartItem where cartItemId in
+      <foreach collection="list" separator="," open="(" 
+       close=")" item="myList">
+       #{myList}
+      </foreach>
+  </select>
+  
+  
+  <!--	public CartItem findByCartItemId(Integer cartItemId);  -->
+  
+  <select id="findByCartItemId" resultType="com.gk.hgx.bean.CartItem">
+    select <include refid="cartSql1"></include> from t_cartItem
+    where cartItemId=#{cartItemId}
+  </select>
+  
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.gk.hgx.mapper.OrderMapper">
+   
+   <resultMap type="com.gk.hgx.bean.Order" id="order1">
+      <id column="oid" property="oid"/>
+      <result column="ordertime" property="ordertime"/>   
+      <result column="status" property="status"/>
+      <result column="address" property="address"/>
+      <result column="total" property="total"/>
+      <result column="uid" property="user.uid"/>
+      <collection property="orderItemList" 
+            select="com.gk.hgx.mapper.OrderMapper.findByOid"
+            column="oid">
+      </collection>
+   </resultMap>
+   
+   <sql id="orderSql1">
+     oid,ordertime,status,address,uid,total
+   </sql>
+   
+   
+   <!--public void updateOrderStatus(Integer oid,Integer status);  -->
+   <update id="updateOrderStatus">
+     update t_order set status=${status} where oid=#{oid}
+   </update>
+   
+   <!-- public List<Order> findByStatus(Integer status); -->
+   
+   <select id="findByStatus" resultMap="order1">
+       select <include refid="orderSql1"></include> from t_order
+       where status=#{status}
+   </select>
+   
+   <!-- 	public List<Order> findAll(); -->
+   <select id="findAll" resultMap="order1">
+     select <include refid="orderSql1"></include> from t_order
+   </select>
+   
+   
+   <!-- public void addOrder(Order order);-->
+   
+   <insert id="addOrder" useGeneratedKeys="true" keyProperty="oid">
+      insert into t_order(<include refid="orderSql1"></include>)  values
+      (#{oid},#{ordertime},#{status},#{address},#{user.uid},#{total})
+   </insert>
+
+
+   <!-- public void addOrderItem(Integer oid, List<OrderItem> orderItemList); -->
+   
+   <insert id="addOrderItem">
+     insert into t_orderitem(orderItemId,quantity,subtotal,bid,oid,bname,currPrice,image_b)
+     values
+     <foreach collection="orderItemList"  separator="," item="orderItem">
+      (#{orderItem.orderItemId},#{orderItem.quantity},#{orderItem.subtotal},
+       #{orderItem.book.bid},#{oid},#{orderItem.book.bname},#{orderItem.book.currPrice},
+       #{orderItem.book.image_b})
+     </foreach> 
+       
+   </insert>
+   
+   <!--public List<Order> get(Integer oid);  -->
+   
+   <select id="get" resultMap="order1">
+       select <include refid="orderSql1"></include>
+        from t_order where oid=#{oid} 
+   </select>
+   
+   
+   <!--public List<Order> findByUid(Integer uid);  -->
+   
+   <select id="findByUid" resultMap="order1">
+      select <include refid="orderSql1"></include>
+      from t_order where uid=#{uid}  
+   </select>
+   
+   
+   <resultMap type="com.gk.hgx.bean.OrderItem" id="order2">
+      <id column="orderItemId" property="orderItemId"/>
+      <result column="oid" property="order.oid"/>
+      <result column="quantity" property="quantity"/>
+      <result column="subtotal" property="subtotal"/>
+      <association property="book" javaType="com.gk.hgx.bean.Book">
+        <id column="bid" property="bid"/>
+        <result column="bname" property="bname"/>
+        <result column="currPrice" property="currPrice"/>
+        <result column="image_b" property="image_b"/>
+      </association>
+   </resultMap>
+   
+   
+   <!-- public List<OrderItem> findByOid(Integer oid); -->
+   <select id="findByOid" resultMap="order2">
+       select orderItemId,quantity,subtotal,bid,oid
+       ,bname,currPrice,image_b from t_orderItem
+        where oid=#{oid} 
+   </select>
+   
+</mapper>

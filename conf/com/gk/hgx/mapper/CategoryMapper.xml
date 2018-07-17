@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.gk.hgx.mapper.CategoryMapper">
+
+	<resultMap type="com.gk.hgx.bean.Category" id="category1">
+		<id column="cid" property="cid" />
+		<result column="cname" property="cname" />
+		<result column="miaoshu" property="miaoshu" />
+		<result column="pid" property="parent.cid" />
+		<result column="orderBy" property="orderBy" />
+	</resultMap>
+
+	<resultMap type="com.gk.hgx.bean.Category" id="category2">
+		<id column="cid" property="cid" />
+		<result column="cname" property="cname" />
+		<result column="miaoshu" property="miaoshu" />
+		<result column="pid" property="parent.cid" />
+		<result column="orderBy" property="orderBy" />
+		<collection property="childs" select="getEveryParentAllChildList"
+			column="cid">
+		</collection>
+	</resultMap>
+
+	<!--public int getCountChild(Integer cid); -->
+	<select id="getCountChild" resultType="integer">
+		select count(1) from
+		t_category where pid=#{cid}
+	</select>
+
+	<!--public void delete(Integer cid); -->
+
+	<delete id="delete">
+		delete from t_category where cid=#{cid}
+	</delete>
+
+
+	<!-- public List<Category> getAllParentNotChildList(); -->
+	<select id="getAllParentNotChildList" resultMap="category1">
+		select cid,cname,miaoshu,orderBy,pid from t_category where pid is null
+	</select>
+
+
+	<!-- public List<Category> getAllPartentList(); -->
+	<select id="getAllPartentList" resultMap="category2">
+		select
+		cid,cname,miaoshu,orderBy,pid from t_category where pid is null
+	</select>
+
+	<!--public List<Category> getEveryParentAllChildList(Category category); -->
+	<select id="getEveryParentAllChildList" resultMap="category1">
+		select
+		cid,cname,miaoshu,orderBy,pid from t_category where pid =#{cid}
+	</select>
+
+	<!-- public Category get(Integer cid); -->
+	<select id="get" resultMap="category1">
+		select cid,cname,miaoshu,orderBy,pid
+		from t_category where cid =#{cid}
+	</select>
+
+	<!--public void update(Category category);- -->
+	<update id="update">
+		<bind name="pid" value="null" />
+		update t_category set cname=#{cname},miaoshu=#{miaoshu},
+		<if test="parent!=null">
+			pid=#{parent.cid}
+		</if>
+		<if test="parent==null">
+			pid=#{pid}
+		</if>
+		where cid=#{cid}
+	</update>
+
+
+	<!--public void add(Category category); -->
+
+	<insert id="add">
+		<bind name="pid" value="null" />
+		insert into t_category(cid,cname,miaoshu,orderBy,pid) values
+		(
+		#{cid},
+		#{cname},
+		#{miaoshu},
+		#{orderBy},
+		<if test="parent!=null">
+			#{parent.cid}
+		</if>
+		<if test="parent==null">
+			#{pid}
+		</if>
+		)
+	</insert>
+
+</mapper>

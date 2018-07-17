@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.gk.hgx.mapper.BookMapper">
+
+	<resultMap type="com.gk.hgx.bean.Book" id="book1">
+		<id column="bid" property="bid" />
+		<result column="image_w" property="image_w" />
+		<result column="image_b" property="image_b" />
+		<association property="category" select="com.gk.hgx.mapper.CategoryMapper.get" column="cid">
+		</association>
+	</resultMap>
+	<sql id="bookSql">
+		bid,bname,author,price,currPrice,discount,press,
+		publishtime,edition,pageNum,wordNum,printtime,booksize,
+		paper,cid,image_w,image_b,orderBy
+	</sql>
+	
+	<!--  public void delete(Book book);-->
+	<delete id="delete">
+	  delete from t_book where bid=#{bid}
+	</delete>
+	
+	
+	
+	<!-- public void update(Book book); -->
+	<update id="update">
+		update t_book set bname=#{bname},author=#{author},price=#{price}
+		,currPrice=#{currPrice},discount=#{discount},press=#{press},
+		publishtime=#{publishtime},edition=#{edition},pageNum=#{pageNum},
+		wordNum=#{wordNum},printtime=#{printtime},booksize=#{booksize},
+		paper=#{paper},cid=#{category.cid} where bid=#{bid}
+	</update>
+
+	<!-- public void add(Book book); -->
+
+	<insert id="add">
+		insert into t_book(
+		<include refid="bookSql"></include>
+		) values(
+		#{bid},#{bname},#{author},#{price},#{currPrice},#{discount},#{press},#{publishtime}
+		,#{edition},#{pageNum},#{wordNum},#{printtime},#{booksize},#{paper}
+		,#{category.cid},#{image_w},#{image_b},#{orderBy})
+	</insert>
+
+
+	<!-- public int getCountByCid(Integer cid); -->
+	<select id="getCountByCid" resultType="integer">
+		select count(1) from t_book where cid=#{cid}
+	</select>
+
+
+	<!-- public List<Book> findSelectBook(Book book); -->
+	<select id="findSelectBook" resultMap="book1">
+		select
+		<include refid="bookSql"></include>
+		from t_book
+		<where>
+			<if test="bid!=null">
+				and bid=#{bid}
+			</if>
+			<if test="bname!=null">
+				<bind name="_bname" value="'%'+bname+'%'" />
+				and bname like #{_bname}
+			</if>
+
+			<if test="category!=null">
+				and cid=#{category.cid}
+			</if>
+
+
+			<if test="author!=null">
+				<bind name="_author" value="'%'+author+'%'" />
+				and author like #{_author}
+			</if>
+
+			<if test="press!=null">
+				<bind name="_press" value="'%'+press+'%'" />
+				and press like #{_press}
+			</if>
+
+		</where>
+	</select>
+
+
+	<!-- public Book load(Integer bid); -->
+	<select id="load" resultMap="book1">
+		select
+		<include refid="bookSql"></include>
+		from t_book
+		where bid=#{bid}
+	</select>
+
+</mapper>
